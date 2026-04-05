@@ -8,5 +8,4 @@ def driver():
     driver.maximize_window()
     yield driver
 
-
     driver.quit()
