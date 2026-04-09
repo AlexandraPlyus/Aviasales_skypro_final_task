@@ -35,19 +35,24 @@ def test_search_ticket_year_ahead():
                 {
                     "origin": origin_city,
                     "destination": destination,
-                    "date": date_year_ahead
+                    "date": date_year_ahead,
                 }
             ],
             "passengers": {"adults": 1},
-            "trip_class": "Y"
-        }
+            "trip_class": "Y",
+        },
     }
-    response = requests.post(tickets, json=body, headers=headers)
-    body_response = response.json()
+    with allure.step("Отправить POST запрос к API для поиска билетов"):
+        response = requests.post(tickets, json=body, headers=headers)
+    with allure.step("Распарсить JSON ответ"):
+        body_response = response.json()
 
-    # Проверяет статус-код и что в теле ответа есть непустой ключ search_id
-    assert response.status_code == 200
-    assert "search_id" in body_response and body_response["search_id"]
+    with allure.step("Проверить, что статус-код ответа равен 200"):
+        assert response.status_code == 200
+    with allure.step(
+        "Проверить, что в ответе присутствует непустой search_id"
+    ):
+        assert "search_id" in body_response and body_response["search_id"]
 
 
 @pytest.mark.api
@@ -64,20 +69,28 @@ def test_search_for_zero_adults():
                 {
                     "origin": origin_city,
                     "destination": destination,
-                    "date": date
+                    "date": date,
                 }
             ],
             "passengers": {"adults": 0},
-            "trip_class": "Y"
-        }
+            "trip_class": "Y",
+        },
     }
-    response = requests.post(tickets, json=body, headers=headers)
-    body_response = response.json()
-    # Проверяет статус-код и сообщение об ошибке
-    assert response.status_code == 400
-    assert (
-        body_response["message"] == 'unexpected number of adult passengers "0"'
-    )
+    with allure.step("Отправить POST запрос к API для поиска билетов"):
+        response = requests.post(tickets, json=body, headers=headers)
+    with allure.step("Распарсить JSON ответ"):
+        body_response = response.json()
+
+    with allure.step("Проверить, что статус-код ответа равен 400"):
+        assert response.status_code == 400
+    with allure.step(
+        "Проверить, что в ответе присутствует сообщение" +
+        "об ошибке '0' пассажиров"
+    ):
+        assert (
+            body_response["message"]
+            == 'unexpected number of adult passengers "0"'
+        )
 
 
 @pytest.mark.api
@@ -95,21 +108,27 @@ def test_search_for_ten_adults():
                 {
                     "origin": origin_city,
                     "destination": destination,
-                    "date": date
+                    "date": date,
                 }
             ],
             "passengers": {"adults": 10},
-            "trip_class": "Y"
-        }
+            "trip_class": "Y",
+        },
     }
-    response = requests.post(tickets, json=body, headers=headers)
-    body_response = response.json()
-    # Проверяет статус-код и сообщение об ошибке
-    assert response.status_code == 400
-    assert (
-        body_response["message"]
-        == 'unexpected number of adult passengers "10"'
-    )
+    with allure.step("Отправить POST запрос к API для поиска билетов"):
+        response = requests.post(tickets, json=body, headers=headers)
+    with allure.step("Распарсить JSON ответ"):
+        body_response = response.json()
+    with allure.step("Проверить, что статус-код ответа равен 400"):
+        assert response.status_code == 400
+    with allure.step(
+        "Проверить, что в ответе присутствует сообщение" +
+        "об ошибке '10' пассажиров"
+    ):
+        assert (
+            body_response["message"]
+            == 'unexpected number of adult passengers "10"'
+        )
 
 
 @pytest.mark.api
@@ -127,23 +146,29 @@ def test_search_return_date_earlier():
                 {
                     "origin": origin_city,
                     "destination": destination,
-                    "date": date
+                    "date": date,
                 },
                 {
                     "origin": destination,
                     "destination": origin_city,
-                    "date": return_date
-                }
+                    "date": return_date,
+                },
             ],
             "passengers": {"adults": 1},
-            "trip_class": "Y"
-        }
+            "trip_class": "Y",
+        },
     }
-    response = requests.post(tickets, json=body, headers=headers)
-    body_response = response.json()
-    # Проверяет статус-код и сообщение об ошибке
-    assert response.status_code == 400
-    assert body_response["message"] == "unexpected order of directions"
+    with allure.step("Отправить POST запрос к API для поиска билетов"):
+        response = requests.post(tickets, json=body, headers=headers)
+    with allure.step("Распарсить JSON ответ"):
+        body_response = response.json()
+    with allure.step("Проверить, что статус-код ответа равен 400"):
+        assert response.status_code == 400
+    with allure.step(
+        "Проверить, что в ответе присутствует" +
+        "сообщение об ошибке неожиданный порядок указаний"
+    ):
+        assert body_response["message"] == "unexpected order of directions"
 
 
 @pytest.mark.api
@@ -161,16 +186,26 @@ def test_search_non_existent_date():
                 {
                     "origin": origin_city,
                     "destination": destination,
-                    "date": non_existent_date
+                    "date": non_existent_date,
                 }
             ],
             "passengers": {"adults": 1},
-            "trip_class": "Y"
-        }
+            "trip_class": "Y",
+        },
     }
-    response = requests.post(tickets, json=body, headers=headers)
-    body_response = response.json()
-    # Проверяет статус-код и сообщения об ошибке
-    assert response.status_code == 400
-    assert "invalid-arguments" in str(body_response)
-    assert f"{non_existent_date}" in str(body_response).lower()
+    with allure.step("Отправить POST запрос к API для поиска билетов"):
+        response = requests.post(tickets, json=body, headers=headers)
+    with allure.step("Распарсить JSON ответ"):
+        body_response = response.json()
+    with allure.step("Проверить, что статус-код ответа равен 400"):
+        assert response.status_code == 400
+    with allure.step(
+        "Проверить, что в ответе присутствует" +
+        "сообщение об ошибке 'invalid-arguments'"
+    ):
+        assert "invalid-arguments" in str(body_response)
+    with allure.step(
+        "Проверить, что в ответе присутствует" +
+        "несуществующая дата: {non_existent_date}"
+    ):
+        assert f"{non_existent_date}" in str(body_response).lower()
