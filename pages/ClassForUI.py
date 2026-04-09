@@ -1,3 +1,5 @@
+import allure
+from config.settings import UIConfig
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,7 +9,8 @@ from selenium.common.exceptions import ElementClickInterceptedException
 
 
 class MyPage:
-    BASE_URL = "https://www.aviasales.ru/"
+    ui_class = UIConfig
+    BASE_URL = ui_class.BASE_URL
 
     INPUT_DESTIN = (By.ID, "avia_form_destination-input")
 
@@ -39,26 +42,35 @@ class MyPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
 
-    def open_my_page(self):
-        # Открывает страницу
+    @allure.step("Открытие главной страницы")
+    def open_my_page(self) -> None:
+        """
+        Открывает главную страницу
+        """
         self.driver.set_page_load_timeout(15)
         try:
-            # Пытаемся загрузить страницу
+            # Пытается загрузить страницу
             self.driver.get(self.BASE_URL)
         except TimeoutException:
-
+            # Останавливает загрузку страницы
             self.driver.execute_script("window.stop();")
-
+        # Ждёт появления поля INPUT_DESTIN
         self.wait.until(EC.presence_of_element_located(self.INPUT_DESTIN))
 
-    def destination_click(self):
-        # Нажимает на поле города назначения
+    @allure.step("Нажатие в поле города назначения")
+    def destination_click(self) -> None:
+        """
+        Нажимает на поле города назначения
+        """
         self.wait.until(
             EC.presence_of_element_located(self.INPUT_DESTIN)
         ).click()
 
-    def input_to_origin_city(self, sity):
-        # Вводит название города "Откуда"
+    @allure.step("Введение названия города 'Откуда'")
+    def input_to_origin_city(self, sity: str) -> None:
+        """
+        Вводит название города 'Откуда'
+        """
         origin_city = self.wait.until(
             EC.presence_of_element_located(self.ORIRGIN_INPUT)
         )
@@ -76,8 +88,11 @@ class MyPage:
             )
         ).click()
 
-    def input_to_destination(self, sity):
-        # Вводит название города "Куда"
+    @allure.step("Ввдение названия города 'Куда'")
+    def input_to_destination(self, sity: str) -> None:
+        """
+        Вводит название города 'Куда'
+        """
         destination = self.wait.until(
             EC.presence_of_element_located(self.INPUT_DESTIN)
         )
@@ -103,13 +118,16 @@ class MyPage:
                 )
             ).click()
 
-            # После клика ждем появления информации о маршруте
+            # После клика ждём появления информации о маршруте
             self.wait.until(
                 EC.presence_of_element_located(self.TICKET_INFORMATION)
             )
 
-    def is_dropdown(self):
-        # Проверяет наличие dropdown на странице
+    @allure.step("Проверка наличия dropdown на странице")
+    def is_dropdown(self) -> bool:
+        """
+        Проверяет наличие dropdown на странице
+        """
         try:
             self.wait.until(EC.presence_of_element_located(self.DROPDOWN))
             return True
@@ -117,8 +135,11 @@ class MyPage:
             print(f"Dropdown не найден: {e}")
             return False
 
-    def is_alert_destination(self):
-        # Проверяет наличие ошибки: отсутствие города назначения
+    @allure.step("Проверка наличия ошибки: отсутствие города назначения")
+    def is_alert_destination(self) -> bool:
+        """
+        Проверяет наличие ошибки: отсутствие города назначения
+        """
         try:
             self.wait.until(EC.presence_of_element_located(self.DESTIN_ALERT))
             return True
@@ -126,8 +147,11 @@ class MyPage:
             print(f"Alert город назначения не найден: {e}")
             return False
 
-    def is_alert_date_form(self):
-        # Проверяет наличие ошибки: отсутствие даты вылета
+    @allure.step("Проверка наличия ошибки: отсутствие даты вылета")
+    def is_alert_date_form(self) -> bool:
+        """
+        Проверяет наличие ошибки: отсутствие даты вылета
+        """
         try:
             self.wait.until(
                 EC.presence_of_element_located(self.DATE_FORM_ALERT)
@@ -137,14 +161,20 @@ class MyPage:
             print(f"Alert не найден: {e}")
             return False
 
-    def click_start_date(self):
-        # Нажимает на дату вылета
+    @allure.step("Нажатие даты вылета")
+    def click_start_date(self) -> None:
+        """
+        Нажимает на дату вылета
+        """
         self.wait.until(
             EC.presence_of_element_located(self.START_DATE)
         ).click()
 
-    def is_calendar(self):
-        # Проверяет наличие calendar на странице
+    @allure.step("Проверка наличия calendar на странице")
+    def is_calendar(self) -> bool:
+        """
+        Проверяет наличие calendar на странице
+        """
         try:
             self.wait.until(EC.presence_of_element_located(self.CALENDAR))
             return True
@@ -152,23 +182,22 @@ class MyPage:
             print(f"Календарь не найден: {e}")
             return False
 
-    def get_origin_city(self):
-        # Возвращает значение из поля 'Откуда'
-        origin_input = self.wait.until(
-            EC.presence_of_element_located(self.ORIRGIN_INPUT)
-        )
-        value = origin_input.get_attribute("value")
-        print(f"Город отправления: {value}")
-        return value
-
-    def get_ticket_information(self, origin_city, destination_city):
-        # Возвращает информацию о маршруте
+    @allure.step("Возвращение информации о маршруте")
+    def get_ticket_information(
+        self, origin_city: str, destination_city: str
+    ) -> str:
+        """
+        Возвращает информацию о маршруте
+        """
         return self.wait.until(
             EC.presence_of_element_located(self.TICKET_INFORMATION)
         ).text
 
-    def click_date(self, date):
-        # Нажимает на кнопку с введённой датой
+    @allure.step("Нажатие кнопки с выбраной датой")
+    def click_date(self, date: str) -> None:
+        """
+        Нажимает на кнопку с введённой датой
+        """
         date_element = self.wait.until(
             EC.presence_of_element_located(
                 (By.XPATH, f'//div[@data-test-id="date-{date}"]')
@@ -179,22 +208,30 @@ class MyPage:
         except ElementClickInterceptedException:
             self.driver.execute_script("arguments[0].click();", date_element)
 
-    def click_checkbox(self):
-        # Нажимает на чекбокс Островка
+    @allure.step("Нажатие чекбокса Островка")
+    def click_checkbox(self) -> None:
+        """
+        Нажимает на чекбокс Островка
+        """
         self.wait.until(EC.presence_of_element_located(self.CHECKBOX)).click()
 
-    def click_search(self):
-        # Нажимает поиск
+    @allure.step("Нажатие кнопки 'Поиск'")
+    def click_search(self) -> None:
+        """
+        Нажимает кнопку 'Поиск'
+        """
         self.wait.until(EC.presence_of_element_located(self.SEARCH)).click()
 
-    def result_search(self):
-        # Проверяет успешность поиска
-        # Проверяет, что URL изменился и содержит search
+    @allure.step("Проверка успешности поиска и содержания в URL search")
+    def result_search(self) -> bool:
+        """
+        Проверяет успешность поиска
+        Проверяет, что URL изменился и содержит search
+        """
         if "search" not in self.driver.current_url:
             print(f"URL не содержит search: {self.driver.current_url}")
             return False
 
-        # Проверяет наличие результатов поиска
         success_selectors = [
             (By.XPATH, "//div[contains(text(), 'Цены на соседние даты')]"),
             (By.CSS_SELECTOR, ".ticket-card, [data-test-id='ticket-card']"),
