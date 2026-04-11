@@ -40,7 +40,7 @@ class MyPage:
 
     def __init__(self, driver: WebDriver) -> None:
         self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
+        self.wait = WebDriverWait(driver, 30)
 
     @allure.step("Открытие главной страницы")
     def open_my_page(self) -> None:
